@@ -51,9 +51,6 @@ def encoder (N, M, filename, directory):
 
 #-------------------------------------
 
-class WrongHeader(Exception):
-  pass
-
 class WrongFormat(Exception):
   pass
 
