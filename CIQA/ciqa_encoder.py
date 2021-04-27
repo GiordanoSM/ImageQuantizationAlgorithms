@@ -5,7 +5,7 @@ from PIL import Image, UnidentifiedImageError
 import numpy as np
 import time
 
-#PIL, numpy, bitstring
+
 def encoder (N, M, filename, directory):
   header = bs.Bits(hex='0xF0') #Header sendo F + numero de bits de padding no final do arquivo
 
@@ -24,12 +24,13 @@ def encoder (N, M, filename, directory):
 
         print("Começando a quantização... (Pode demorar um pouco)")
         start = time.time()
-        data_out, paddings = adaptiveQuantizer(N, M, data)
+        data_out, paddings, n_blocks_h = adaptiveQuantizer(N, M, data)
 
         header.tofile(f_write)
 
         bs.Bits(uint=N, length=8).tofile(f_write)
         bs.Bits(uint=M, length=8).tofile(f_write)
+        bs.Bits(uint=n_blocks_h, length=8).tofile(f_write)
 
         bs.Bits(uint=paddings[0], length=8).tofile(f_write)
         bs.Bits(uint=paddings[1], length=8).tofile(f_write)
@@ -63,7 +64,7 @@ def adaptiveQuantizer(N, M, data):
 
   padded_data, paddings = pad(N, data)
 
-  blocks = getBlocks(N, padded_data)
+  blocks, n_blocks_h = getBlocks(N, padded_data)
 
   bpp = np.ceil(np.log2(M))
 
@@ -78,7 +79,7 @@ def adaptiveQuantizer(N, M, data):
 
   paddings.append((8 - (data_out.len % 8)) % 8)
 
-  return data_out, paddings
+  return data_out, paddings, n_blocks_h
 
 #------------------------------------
 
@@ -104,7 +105,7 @@ def pad (N, data):
   return np.pad(data, ((0,missing(data.shape[0])), (0,missing(data.shape[1])))), paddings
 
 #-------------------------------------
-
+#Bem comportado até 255 blocos na horizontal
 def getBlocks(N, data):
   n_blocks_h = data.shape[0]/N
   n_blocks_v = data.shape[1]/N
@@ -115,7 +116,7 @@ def getBlocks(N, data):
     for c in range(0, data.shape[1], N):
       blocks.append(data[l:l+N,range(c, c+N)])
 
-  return blocks
+  return blocks, int(n_blocks_h)
 
 #-------------------------------------
 

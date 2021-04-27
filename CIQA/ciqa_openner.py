@@ -2,6 +2,7 @@ from PIL import Image, UnidentifiedImageError
 import numpy as np
 import bitstring as bs
 import sys
+import time
  
 def openner (filename):
 
@@ -16,12 +17,17 @@ def openner (filename):
     N = bs.Bits(filename= filename, length=8, offset=8).uint
     M = bs.Bits(filename= filename, length=8, offset=16).uint
 
-    padding_lin = bs.Bits(filename= filename, length=8, offset=24).uint
-    padding_col = bs.Bits(filename= filename, length=8, offset=32).uint
+    n_blocos_h = bs.Bits(filename= filename, length=8, offset=24).uint
 
+    padding_lin = bs.Bits(filename= filename, length=8, offset=32).uint
+    padding_col = bs.Bits(filename= filename, length=8, offset=40).uint
+
+    start = time.time()
     blocks = decoder(N, M, padding_end, filename)
 
     image_array = removeImagePadding(blocks, padding_lin, padding_col)
+    end = time.time()
+    print('Demorou: {} segundos'.format(end - start))
  
   except IOError as ioe:
     sys.exit('ERRO: Arquivo ou diretório "{}" não existente.'.format(ioe.filename))
@@ -37,7 +43,7 @@ def decoder(N, M, padding_end, filename):
 
   block_size = 2*8 + bpp*N*N #em bits
 
-  data = bs.Bits(filename=filename, offset= 40)
+  data = bs.Bits(filename=filename, offset= 48)
 
   if padding_end != 0:
     data = data[:-padding_end]
@@ -65,6 +71,7 @@ def decoder(N, M, padding_end, filename):
 
 #------------------------------------------
 def reconstructArray(blocks):
+
   pass
 
 #------------------------------------------
