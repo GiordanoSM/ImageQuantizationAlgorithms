@@ -25,7 +25,7 @@ def openner (filename):
     start = time.time()
     blocks = decoder(N, M, padding_end, filename)
 
-    image_array = removeImagePadding(blocks, padding_lin, padding_col)
+    image_array = reconstructImageArray(blocks, n_blocos_h, padding_lin, padding_col)
     end = time.time()
     print('Demorou: {} segundos'.format(end - start))
  
@@ -67,16 +67,24 @@ def decoder(N, M, padding_end, filename):
 
     data = data[block_size:]
 
-  reconstructArray(blocks)
+  return blocks
 
 #------------------------------------------
-def reconstructArray(blocks):
+def reconstructImageArray(blocks, n_blocos_h, padding_lin, padding_col):
 
-  pass
+  lines = []
+
+  for i in range(0, len(blocks), n_blocos_h):
+    lines.append(np.concatenate(blocks[i:i+n_blocos_h], axis=1))
+
+  image_array = np.concatenate(lines, axis=0)
+
+  return removeImagePadding(image_array, padding_lin, padding_col)
 
 #------------------------------------------
-def removeImagePadding(blocks, padding_lin, padding_col):
-  pass
+def removeImagePadding(array, padding_lin, padding_col):
+  array = np.delete(array, np.s_[-padding_lin:], axis= 0)
+  return np.delete(array, np.s_[-padding_col:], axis= 1)
 
 #-------------------------------------------
 #Checa se o header corresponde com o esperado e retorna o padding informado por ele
