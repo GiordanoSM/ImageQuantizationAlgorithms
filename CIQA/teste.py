@@ -67,6 +67,7 @@ jpg_names = ["test/peppers8_12.jpg","test/peppers4.jpg","test/peppers0.jpg",
 bpp_jpg= [os.stat(f).st_size*8/total_pixels for f in jpg_names]
 
 results_jpg = []
+psnr_jpg = []
 
 for filename in jpg_names:
   with Image.open(filename) as im:
@@ -79,11 +80,11 @@ with Image.open(filename_enc) as im:
   data = np.asarray(im).astype(np.int16)
   mse_jpg = [np.sum((data - r.astype(np.int16))**2)/total_pixels for r in results_jpg]
   for i in range(len(results_jpg)):
-    psnr.append(10 * np.log10((2**bd-1)**2/mse_jpg[i]))
+    psnr_jpg.append(10 * np.log10((2**bd-1)**2/mse_jpg[i]))
 
 fig, ax = plt.subplots()
 ax.plot(lch_bpp, lch_psnr,label="CIQA")
-ax.plot(bpp_jpg, mse_jpg,label="JPEG")
+ax.plot(bpp_jpg, psnr_jpg,label="JPEG")
 ax.set_xlabel('bpp')
 ax.set_ylabel('PSNR')
 ax.set_title('PSNR x BPP')
