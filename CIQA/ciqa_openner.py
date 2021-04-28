@@ -1,4 +1,4 @@
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, UnidentifiedImageError, ImageShow
 import numpy as np
 import bitstring as bs
 import sys
@@ -28,6 +28,11 @@ def openner (filename):
     image_array = reconstructImageArray(blocks, n_blocos_h, padding_lin, padding_col)
     end = time.time()
     print('Demorou: {} segundos'.format(end - start))
+    print(image_array)
+    
+    im = Image.fromarray(image_array)
+
+    ImageShow.show(im)
  
   except IOError as ioe:
     sys.exit('ERRO: Arquivo ou diretório "{}" não existente.'.format(ioe.filename))
@@ -58,7 +63,7 @@ def decoder(N, M, padding_end, filename):
     values = data[16:block_size]
 
     delta = (_max - _min)/M
-    y = np.array([delta*(2*i - 1)/2 for i in range(1, M+1)])
+    y = np.array([delta*(2*i - 1)/2 + _min for i in range(1, M+1)]).astype(np.uint8)
 
     for i in range(0, values.len, bpp):
       block.append(y[values[i:i+bpp].uint])
@@ -78,13 +83,16 @@ def reconstructImageArray(blocks, n_blocos_h, padding_lin, padding_col):
     lines.append(np.concatenate(blocks[i:i+n_blocos_h], axis=1))
 
   image_array = np.concatenate(lines, axis=0)
-
+  
   return removeImagePadding(image_array, padding_lin, padding_col)
 
 #------------------------------------------
 def removeImagePadding(array, padding_lin, padding_col):
-  array = np.delete(array, np.s_[-padding_lin:], axis= 0)
-  return np.delete(array, np.s_[-padding_col:], axis= 1)
+  if padding_lin != 0:
+    array = np.delete(array, np.s_[-padding_lin:], axis= 0)
+  if padding_col != 0:
+    array = np.delete(array, np.s_[-padding_col:], axis= 1)
+  return array
 
 #-------------------------------------------
 #Checa se o header corresponde com o esperado e retorna o padding informado por ele

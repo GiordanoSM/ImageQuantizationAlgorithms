@@ -20,6 +20,7 @@ def encoder (N, M, filename, directory):
           raise WrongFormat()
 
         data = np.asarray(im)
+        print(data)
 
 
         print("Começando a quantização... (Pode demorar um pouco)")
@@ -71,7 +72,8 @@ def adaptiveQuantizer(N, M, data):
   for b in blocks:
     info = (np.min(b), np.max(b))
     delta = (info[1] - info[0])/M
-    y = np.array([delta*(2*i - 1)/2 for i in range(1, M+1)])
+    y = np.array([delta*(2*i - 1)/2 + info[0] for i in range(1, M+1)]).astype(np.uint8)
+    #print("Aqui", y, info)
 
     data_out = data_out + quantizeFunc(b, y, bpp, info)
 
@@ -86,15 +88,17 @@ def adaptiveQuantizer(N, M, data):
 def quantizeFunc(block, y, bpp, info):
   out = bs.Bits(uint=info[0], length=8) + bs.Bits(uint=info[1], length=8)
 
+  #print(np.reshape(block, (1,-1))[0])
   for i in np.reshape(block, (1,-1))[0]:
-    idx = findNearestIdx(y, i)
+    idx = findNearestIdx(y.astype(np.int16), i)
+    #print(idx)
     out = out + bs.Bits(uint=idx, length=int(bpp))
 
   return out
 
 #------------------------------------
 def findNearestIdx(array, value):
-    return (np.abs(array - value)).argmin()
+  return (np.abs(array - value)).argmin()
 
 #-------------------------------------
 #Bem comportado até padding maximo de 255
