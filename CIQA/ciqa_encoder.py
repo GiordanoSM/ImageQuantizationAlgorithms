@@ -20,7 +20,7 @@ def encoder (N, M, filename, directory):
           raise WrongFormat()
 
         data = np.asarray(im)
-        print(data)
+        #print(data)
 
 
         print("Começando a quantização... (Pode demorar um pouco)")
@@ -29,12 +29,12 @@ def encoder (N, M, filename, directory):
 
         header.tofile(f_write)
 
-        bs.Bits(uint=N, length=8).tofile(f_write)
-        bs.Bits(uint=M, length=8).tofile(f_write)
-        bs.Bits(uint=n_blocks_h, length=8).tofile(f_write)
+        bs.Bits(uint=N, length=8).tofile(f_write)#número de pixels por bloco NxN
+        bs.Bits(uint=M, length=8).tofile(f_write)#número de intervalos na quantização
+        bs.Bits(uint=n_blocks_h, length=8).tofile(f_write)#informa a quantidade de blocos na horizontal
 
-        bs.Bits(uint=paddings[0], length=8).tofile(f_write)
-        bs.Bits(uint=paddings[1], length=8).tofile(f_write)
+        bs.Bits(uint=paddings[0], length=8).tofile(f_write)#número de linhas colocadas como padding
+        bs.Bits(uint=paddings[1], length=8).tofile(f_write)#número de colunas colocadas como padding
 
         data_out.tofile(f_write)
 
@@ -57,7 +57,7 @@ class WrongFormat(Exception):
   pass
 
 #-------------------------------------
-
+#Responsável por dividir a imagem em blocos, fazer os paddings, e retornar os bits resultantes
 def adaptiveQuantizer(N, M, data):
 
   data_out = bs.Bits(bin='0b')
@@ -84,14 +84,12 @@ def adaptiveQuantizer(N, M, data):
   return data_out, paddings, n_blocks_h
 
 #------------------------------------
-
+#Função que retorna os bits referentes ao bloco em questão (min -> max -> pixels)
 def quantizeFunc(block, y, bpp, info):
   out = bs.Bits(uint=info[0], length=8) + bs.Bits(uint=info[1], length=8)
 
-  #print(np.reshape(block, (1,-1))[0])
   for i in np.reshape(block, (1,-1))[0]:
     idx = findNearestIdx(y.astype(np.int16), i)
-    #print(idx)
     out = out + bs.Bits(uint=idx, length=int(bpp))
 
   return out

@@ -4,35 +4,37 @@ import bitstring as bs
 import sys
 import time
  
-def openner (filename):
+def openner (filename, show_image=True):
 
   if filename[-4:] != '.cqa': #Verifica se a extensão do arquivo a ser lido é a esperada
     sys.exit('Erro: Esperado arquivo de extensão: ".cqa".')
 
   try:
-    header = bs.Bits(filename= filename, length=8)
+    header = bs.Bits(filename= filename, length=8)#Header sendo F + numero de bits de padding no final do arquivo
 
-    padding_end = check_header(header)
+    padding_end = check_header(header)#Extrai o tamanho do padding do final do arquivo do header e verifica-o
 
-    N = bs.Bits(filename= filename, length=8, offset=8).uint
-    M = bs.Bits(filename= filename, length=8, offset=16).uint
+    N = bs.Bits(filename= filename, length=8, offset=8).uint #número de pixels por bloco NxN
+    M = bs.Bits(filename= filename, length=8, offset=16).uint#número de intervalos na quantização
 
-    n_blocos_h = bs.Bits(filename= filename, length=8, offset=24).uint
+    n_blocos_h = bs.Bits(filename= filename, length=8, offset=24).uint#informa a quantidade de blocos na horizontal
 
-    padding_lin = bs.Bits(filename= filename, length=8, offset=32).uint
-    padding_col = bs.Bits(filename= filename, length=8, offset=40).uint
+    padding_lin = bs.Bits(filename= filename, length=8, offset=32).uint#número de linhas colocadas como padding
+    padding_col = bs.Bits(filename= filename, length=8, offset=40).uint#número de colunas colocadas como padding
 
+    print("Começando a decodificação... (Pode demorar um pouco)")
     start = time.time()
-    blocks = decoder(N, M, padding_end, filename)
+    blocks = decoder(N, M, padding_end, filename)#Extrai os blocos individualmente dos dados
 
-    image_array = reconstructImageArray(blocks, n_blocos_h, padding_lin, padding_col)
+    image_array = reconstructImageArray(blocks, n_blocos_h, padding_lin, padding_col)#Retornar o array com a imagem decodificada
     end = time.time()
     print('Demorou: {} segundos'.format(end - start))
-    print(image_array)
+    #print(image_array)
     
     im = Image.fromarray(image_array)
 
-    ImageShow.show(im)
+    if show_image:
+      ImageShow.show(im, title= "N={},M={}".format(N,M))
  
   except IOError as ioe:
     sys.exit('ERRO: Arquivo ou diretório "{}" não existente.'.format(ioe.filename))
@@ -40,8 +42,10 @@ def openner (filename):
   except WrongHeader:
     sys.exit('Erro: Header do arquivo não condiz com o esperado.')
 
-#-------------------------------------------
+  return image_array
 
+#-------------------------------------------
+#Tem a função de extrair todos os blocos existentes mantendo seus formatos originais
 def decoder(N, M, padding_end, filename):
 
   bpp = int(np.ceil(np.log2(M)))
@@ -75,6 +79,7 @@ def decoder(N, M, padding_end, filename):
   return blocks
 
 #------------------------------------------
+#Tem a função de reorganizar os blocos no formato da imagem original
 def reconstructImageArray(blocks, n_blocos_h, padding_lin, padding_col):
 
   lines = []
