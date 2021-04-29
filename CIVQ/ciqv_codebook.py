@@ -4,8 +4,7 @@ import sys
 from PIL import Image, UnidentifiedImageError
 import numpy as np
 import time
-from scipy.spatial.distance import cdist
-#from scipy.cluster.vq import vq, kmeans, whiten
+from sklearn.cluster import KMeans
 
 def codebookGen(filename, M, L, directory=""):
   no_path_name = fh.remove_path(filename) #Adquire somente o nome do arquivo em a ser lido
@@ -20,9 +19,24 @@ def codebookGen(filename, M, L, directory=""):
 
         data = np.asarray(im)
 
+        print("Começando a construção do codebook... (Pode demorar um pouco)")
+        start = time.time()
+
         elements = getElements(M, L, data)
 
-        code_vectors = LBG(elements, M)
+        code_vectors = kmeans(np.array(elements), M)
+        code_vectors_list = code_vectors.astype(np.uint8).reshape(1,-1)[0]
+
+        f_write.write((M-1).to_bytes(1, byteorder='big'))#M-1 para aceitar M=256
+        f_write.write(L.to_bytes(1, byteorder='big'))
+
+        for b in code_vectors_list:
+          f_write.write(b.tobytes())
+
+        end = time.time()
+        print('Demorou: {} segundos'.format(end - start))
+
+
 
 
   except IOError as ioe:
@@ -35,30 +49,11 @@ def codebookGen(filename, M, L, directory=""):
 
 #----------------------------------
 
-def LBG (elements, M, D=[]):
-  #np.random.seed(time.time())
-  np.random.seed((1000,2000))
+def kmeans (elements, M, D=None):
 
-  n_dimensions = elements[0].size
+  kmeans = KMeans(n_clusters= M).fit(elements)
 
-  epsilon = 0.025
-
-  y = []
-
-  idxs = []
-
-  for i in range(M):
-    y.append(np.random.rand(n_dimensions)*255)
-
-  distances = cdist(np.array(elements), np.array(y))
-
-  for e in distances:
-    idxs.append(e.argmin())
-
-  D1 = np.sum([cdist([elements[i]], [y[idxs[i]]]) for i in range(len(elements))])/len(elements)
-
-  #print(idxs)
-  #print(D1)
+  return kmeans.cluster_centers_
 
 #-----------------------------------
 
