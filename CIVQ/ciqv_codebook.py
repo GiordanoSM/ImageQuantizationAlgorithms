@@ -1,4 +1,4 @@
-import filename_handler as fh
+import helper as hp
 import sys
 from PIL import Image, UnidentifiedImageError
 import numpy as np
@@ -6,8 +6,8 @@ import time
 from sklearn.cluster import KMeans
 
 def codebookGen(filename, M, L, directory=""):
-  no_path_name = fh.remove_path(filename) #Adquire somente o nome do arquivo em a ser lido
-  filename_result = fh.add_path_cdb(directory, no_path_name) #Cria o nome do codebook junto com o diretório alvo
+  no_path_name = hp.remove_path(filename) #Adquire somente o nome do arquivo em a ser lido
+  filename_result = hp.add_path_cdb(directory, no_path_name) #Cria o nome do codebook junto com o diretório alvo
 
   try:
     with Image.open(filename) as im:
@@ -24,7 +24,7 @@ def codebookGen(filename, M, L, directory=""):
         elements = getElements(M, L, data)
 
         code_vectors = kmeans(np.array(elements), M)
-        print(code_vectors.astype(np.uint8))
+        
         code_vectors_list = code_vectors.astype(np.uint8).reshape(1,-1)[0]
 
         f_write.write((M-1).to_bytes(1, byteorder='big'))#M-1 para aceitar M=256
