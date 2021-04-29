@@ -24,7 +24,7 @@ def openner (filename, show_image=True):
     codebook, offset = codebookParser(filename, M, L, 24)
     #print(codebook, offset)
 
-    n_blocos_h = bs.Bits(filename= filename, length=8, offset=offset).uint#informa a quantidade de blocos na horizontal
+    n_blocos_h = int(bs.Bits(filename= filename, length=8, offset=offset).uint) + 1#informa a quantidade de blocos na horizontal
 
     padding_lin = bs.Bits(filename= filename, length=8, offset=offset+8).uint#número de linhas colocadas como padding
     padding_col = bs.Bits(filename= filename, length=8, offset=offset+16).uint#número de colunas colocadas como padding
@@ -47,6 +47,7 @@ def openner (filename, show_image=True):
   except WrongHeader:
     sys.exit('Erro: Header do arquivo não condiz com o esperado.')
 
+  return image_array
 
 #------------------------------------------
 #Tem a função de reorganizar os blocos no formato da imagem original

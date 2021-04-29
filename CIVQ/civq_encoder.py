@@ -43,7 +43,7 @@ def encoder(filename, codebook_name, directory=""):
 
           blocks, n_blocks_h = getBlocks(N, padded_data)
 
-          bs.Bits(uint=n_blocks_h, length=8).tofile(f_write)#informa a quantidade de blocos na horizontal
+          bs.Bits(uint=n_blocks_h-1, length=8).tofile(f_write)#informa a quantidade de blocos na horizontal
           bs.Bits(uint=paddings[0], length=8).tofile(f_write)#número de linhas colocadas como padding
           bs.Bits(uint=paddings[1], length=8).tofile(f_write)#número de colunas colocadas como padding
 
