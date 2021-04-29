@@ -117,6 +117,6 @@ class WrongHeader(Exception):
 if __name__ == '__main__':
   if len(sys.argv) > 1:
     filename = sys.argv[1]
-  else: filename = input("Informe o nome (caminho) do arquivo a ser codificado: ")
+  else: filename = input("Informe o nome (caminho) da imagem (.cqa) a ser aberta: ")
 
   openner(filename)
