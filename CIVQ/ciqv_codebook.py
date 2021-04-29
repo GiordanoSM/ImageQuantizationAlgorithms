@@ -3,6 +3,9 @@ import bitstring as bs
 import sys
 from PIL import Image, UnidentifiedImageError
 import numpy as np
+import time
+from scipy.spatial.distance import cdist
+#from scipy.cluster.vq import vq, kmeans, whiten
 
 def codebookGen(filename, M, L, directory=""):
   no_path_name = fh.remove_path(filename) #Adquire somente o nome do arquivo em a ser lido
@@ -19,6 +22,9 @@ def codebookGen(filename, M, L, directory=""):
 
         elements = getElements(M, L, data)
 
+        code_vectors = LBG(elements, M)
+
+
   except IOError as ioe:
     sys.exit('ERRO: Arquivo ou diretório "{}" não existente.'.format(ioe.filename))
 
@@ -29,8 +35,30 @@ def codebookGen(filename, M, L, directory=""):
 
 #----------------------------------
 
-def LGB (elements, M):
-  pass
+def LBG (elements, M, D=[]):
+  #np.random.seed(time.time())
+  np.random.seed((1000,2000))
+
+  n_dimensions = elements[0].size
+
+  epsilon = 0.025
+
+  y = []
+
+  idxs = []
+
+  for i in range(M):
+    y.append(np.random.rand(n_dimensions)*255)
+
+  distances = cdist(np.array(elements), np.array(y))
+
+  for e in distances:
+    idxs.append(e.argmin())
+
+  D1 = np.sum([cdist([elements[i]], [y[idxs[i]]]) for i in range(len(elements))])/len(elements)
+
+  #print(idxs)
+  #print(D1)
 
 #-----------------------------------
 
