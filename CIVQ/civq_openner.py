@@ -31,14 +31,43 @@ def openner (filename, show_image=True):
 
     blocks = decoder(codebook, filename, M, L, padding_end, offset+24)#Extrai os blocos individualmente dos dados
 
+    image_array = reconstructImageArray(blocks, n_blocos_h, padding_lin, padding_col)#Retornar o array com a imagem decodificada
+
     end = time.time()
     print('Demorou: {} segundos'.format(end - start))
+
+    im = Image.fromarray(image_array)
+
+    if show_image:
+      ImageShow.show(im)
 
   except IOError as ioe:
     sys.exit('ERRO: Arquivo ou diretório "{}" não existente.'.format(ioe.filename))
 
   except WrongHeader:
     sys.exit('Erro: Header do arquivo não condiz com o esperado.')
+
+
+#------------------------------------------
+#Tem a função de reorganizar os blocos no formato da imagem original
+def reconstructImageArray(blocks, n_blocos_h, padding_lin, padding_col):
+
+  lines = []
+
+  for i in range(0, len(blocks), n_blocos_h):
+    lines.append(np.concatenate(blocks[i:i+n_blocos_h], axis=1))
+
+  image_array = np.concatenate(lines, axis=0)
+  
+  return removeImagePadding(image_array, padding_lin, padding_col)
+
+#------------------------------------------
+def removeImagePadding(array, padding_lin, padding_col):
+  if padding_lin != 0:
+    array = np.delete(array, np.s_[-padding_lin:], axis= 0)
+  if padding_col != 0:
+    array = np.delete(array, np.s_[-padding_col:], axis= 1)
+  return array
 
 #-------------------------------------------
 #Tem a função de extrair todos os blocos existentes mantendo seus formatos originais
