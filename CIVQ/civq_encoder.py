@@ -22,8 +22,8 @@ def encoder(filename, codebook_name, directory=""):
       print("Começando a codificação... (Pode demorar um pouco)")
       start = time.time()
 
-      M, L, codebook = hp.codebookParser(f_read)
-      #print(M, L)
+      M, L, codebook = codebookParser(f_read)
+      #print(codebook)
       f_read.seek(0)
 
       with Image.open(filename) as im:
@@ -101,6 +101,22 @@ def getBlocks(N, data):
       blocks.append(data[l:l+N,range(c, c+N)].reshape(1,-1)[0])
 
   return np.array(blocks), int(n_blocks_h)
+
+#----------------------------------------------
+
+def codebookParser (f_read):
+  M = int.from_bytes(f_read.read(1), byteorder='big') + 1
+  L = int.from_bytes(f_read.read(1), byteorder='big')
+
+  codebook = []
+
+  buffer = f_read.read(L)
+
+  while(buffer):
+    codebook.append(np.frombuffer(buffer, dtype= np.uint8))
+    buffer = f_read.read(L)
+
+  return M, L, np.array(codebook)
 
 #----------------------------------------------
 
