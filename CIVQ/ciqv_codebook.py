@@ -1,5 +1,4 @@
 import filename_handler as fh
-import bitstring as bs
 import sys
 from PIL import Image, UnidentifiedImageError
 import numpy as np
@@ -25,6 +24,7 @@ def codebookGen(filename, M, L, directory=""):
         elements = getElements(M, L, data)
 
         code_vectors = kmeans(np.array(elements), M)
+        print(code_vectors.astype(np.uint8))
         code_vectors_list = code_vectors.astype(np.uint8).reshape(1,-1)[0]
 
         f_write.write((M-1).to_bytes(1, byteorder='big'))#M-1 para aceitar M=256
