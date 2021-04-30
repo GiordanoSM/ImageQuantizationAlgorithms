@@ -91,8 +91,8 @@ def pad (N, data):
 #----------------------------------------------
 #Bem comportado até 255 blocos na horizontal
 def getBlocks(N, data):
-  n_blocks_h = data.shape[0]/N
-  n_blocks_v = data.shape[1]/N
+  n_blocks_h = data.shape[1]/N
+  n_blocks_v = data.shape[0]/N
 
   blocks = []
 
