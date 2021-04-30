@@ -21,7 +21,7 @@ def openner (filename, use_dit= True, show_image=True):
 
     num_col = bs.Bits(filename= filename, length=16, offset=16).uint#Número de colunas na imagem original
 
-    #pixels = decoder(filename, M, padding_end, offset)#Extrai os pixels codificados
+    pixels = decoder(filename, M, padding_end, 32)#Extrai os pixels codificados
 
     #image_array = reconstructImageArray(pixels, num_col, mode)#Retornar o array com a imagem decodificada
 
@@ -43,7 +43,24 @@ def openner (filename, use_dit= True, show_image=True):
 #------------------------------
 #Tem a função de extrair todos os pixels codificados
 def decoder (filename, M, padding_end, offset):
-  pass
+  bpp = int(np.ceil(np.log2(M)))
+
+  data = bs.Bits(filename=filename, offset= offset)
+
+  if padding_end != 0:
+    data = data[:-padding_end]
+
+  pixels = []
+
+  delta = 255/M
+  y = np.array([delta*(2*i - 1)/2 for i in range(1, M+1)])
+
+  while data != bs.Bits(bin= "0b"):
+    idx = data[:bpp].uint
+    pixels.append(y[idx])
+    data = data[bpp:]
+
+  return np.array(pixels).astype(np.uint8)
 
 #------------------------------
 #Tem a função de reorganizar os pixels no formato da imagem original
