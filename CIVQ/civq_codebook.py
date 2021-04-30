@@ -49,7 +49,7 @@ def codebookGen(filename, M, L, directory=""):
 
 #----------------------------------
 
-def kmeans (elements, M, D=None):
+def kmeans (elements, M):
 
   kmeans = KMeans(n_clusters= M).fit(elements)
 
