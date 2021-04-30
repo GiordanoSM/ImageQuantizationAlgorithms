@@ -23,11 +23,13 @@ def encoder(filename, M, directory=''):
 
       data = np.asarray(im)
 
-      padding_col, padded_data = pad(L, data)
+      padded_data, padding_col = pad(L, data)
 
-      blocks, n_blocks_h = getBlocks(padded_data, L)
+      #blocks, n_blocks_h = getBlocks(padded_data, L)
 
-      codebook, idxs = makeCodebook(M, blocks)
+      #codebook, idxs = makeCodebook(M, blocks)
+
+      #padding = (8 - (data_out.len % 8)) % 8
 
   except IOError as ioe:
     sys.exit('ERRO: Arquivo ou diretório "{}" não existente.'.format(ioe.filename))
@@ -39,15 +41,19 @@ def encoder(filename, M, directory=''):
 
 #------------------------------
 def getBlocks(data, l):
-  return blocks, int(n_blocks_h)
+  pass
+  #return blocks, int(n_blocks_h)
 
 #------------------------------
 def makeCodebook(m, blocks):
-  return codebook, idxs
+  pass
+  #return codebook, idxs
 
 #------------------------------
 def pad (L, data):
-  return padding_col#, np.pad(data, ((0,missing(data.shape[0])), (0,missing(data.shape[1]))))
+  missing = lambda x: (L - (x % L)) % L
+  padding_col = np.uint8(missing(data.shape[1]%L))
+  return np.pad(data, ((0,0), (0,missing(data.shape[1])), (0,0))), padding_col
 
 #------------------------------
 if __name__ == "__main__":
