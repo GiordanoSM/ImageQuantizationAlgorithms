@@ -92,8 +92,6 @@ def decoder(codebook, filename, M, L, padding_end, offset):
 
 #------------------------------------------
 def codebookParser (filename, M, L, offset):
-  bpb = int(np.ceil(np.log2(M)))
-
   codebook = []
 
   for i in range(M):
