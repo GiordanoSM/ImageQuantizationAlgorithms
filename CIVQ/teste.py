@@ -29,7 +29,7 @@ for l in L_l:
   for m in M_l:
     cc.codebookGen(filename_enc, m, l, directory_code)
     ce.encoder(filename_enc, filename_cod, directory_enc)
-    results.append(co.openner(filename_dec, show_image=True))
+    results.append(co.openner(filename_dec, show_image=False))
     bpp.append(os.stat(filename_dec).st_size*8/total_pixels)
     sizes.append(os.stat(filename_dec).st_size)
 
