@@ -25,15 +25,13 @@ def encoder(filename, M, directory=''):
 
       padded_data, padding_col = pad(L, data)
   
-      print(padded_data)
-      print(padding_col)
+      #print(padded_data)
 
       blocks, n_blocks_h = getBlocks(padded_data, L)
 
-      print(blocks)
-      print(n_blocks_h)
-
       #codebook, idxs = makeCodebook(M, blocks)
+
+      #n_blocks_h e M: codificar -1
 
       #padding = (8 - (data_out.len % 8)) % 8
 
@@ -46,10 +44,16 @@ def encoder(filename, M, directory=''):
   print("Terminado! Criado arquivo '{}'.\n".format(filename_result))
 
 #------------------------------
-def getBlocks(data, l):
-  n_blocks_h = data.shape[1]/N
+def getBlocks(data, L):
+  n_blocks_h = data.shape[1]/L
 
-  return blocks, int(n_blocks_h)
+  blocks = []
+
+  for l in range(data.shape[0]):
+    for c in range(0, data.shape[1], L):
+      blocks.append(data[l:l+1,range(c, c+L)][0])#Pega cada bloco como um array de pixels
+
+  return np.array(blocks), int(n_blocks_h)
 
 #------------------------------
 def makeCodebook(m, blocks):
