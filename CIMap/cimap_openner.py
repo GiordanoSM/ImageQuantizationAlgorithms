@@ -24,11 +24,17 @@ def openner (filename, show_image=True):
 
     codebook, offset = codebookParser(filename, M, 32)
 
-    print(padding_end, M, num_col)
-    print(codebook)
-    
+    pixels = decoder(codebook, filename, M, padding_end, offset)#Extrai os pixels codificados
+
+    image_array = reconstructImageArray(pixels, num_col)#Retornar o array com a imagem decodificada
+
     end = time.time()
     print('Demorou: {} segundos'.format(end - start))
+
+    im = Image.fromarray(image_array)
+
+    if show_image:
+      ImageShow.show(im)
 
   except IOError as ioe:
     sys.exit('ERRO: Arquivo ou diretório "{}" não existente.'.format(ioe.filename))
@@ -36,9 +42,10 @@ def openner (filename, show_image=True):
   except WrongHeader:
     sys.exit('Erro: Header do arquivo não condiz com o esperado.')
 
+  return image_array
+
 #------------------------------------------
 def codebookParser (filename, M, offset):
-  bpp = int(np.ceil(np.log2(M)))
   codebook = []
 
   for i in range(M):
@@ -49,13 +56,34 @@ def codebookParser (filename, M, offset):
 
 #-------------------------------------------
 #Tem a função de reorganizar os pixels no formato da imagem original
-def reconstructImageArray():
-  pass
+def reconstructImageArray(pixels, num_col):
+  image_array = []
+
+  for i in range(0, len(pixels), num_col):
+    image_array.append(pixels[i:i+num_col])
+
+  #image_array = np.concatenate(lines, axis=0)
+  
+  return np.array(image_array)
 
 #-------------------------------------------
 #Tem a função de extrair todos os pixels codificados
-def decoder(codebook, data, M, padding_end):
-  pass
+def decoder(codebook, filename, M, padding_end, offset):
+  bpp = int(np.ceil(np.log2(M)))
+
+  data = bs.Bits(filename=filename, offset= offset)
+
+  if padding_end != 0:
+    data = data[:-padding_end]
+
+  blocks = []
+
+  while data != bs.Bits(bin= "0b"):
+    idx = data[:bpp].uint
+    blocks.append(codebook[idx])
+    data = data[bpp:]
+
+  return np.array(blocks)
 
 #-------------------------------------------
 #Checa se o header corresponde com o esperado e retorna o padding informado por ele
