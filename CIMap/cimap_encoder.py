@@ -8,8 +8,6 @@ from sklearn.cluster import KMeans
 
 def encoder(filename, M, directory=''):
 
-  L = 3 #Número de pixel em um elemento/bloco, faz um elemento como L pixels na horizontal
-
   header = bs.Bits(hex='0xF0') #Header sendo F + numero de bits de padding no final do arquivo
 
   no_path_name = hp.remove_path(filename) #Adquire somente o nome do arquivo em a ser lido
@@ -23,17 +21,23 @@ def encoder(filename, M, directory=''):
 
       data = np.asarray(im)
 
-      padded_data, padding_col = pad(L, data)
-  
-      #print(padded_data)
+      num_col = np.uint16(data.shape[1]) #Passar como informação lateral
 
-      blocks, n_blocks_h = getBlocks(padded_data, L)
+      elements = getElements(data) #Retorna lista com todos os elementos (pixels)
 
-      #codebook, idxs = makeCodebook(M, blocks)
+      print("Começando a codificação... (Pode demorar um pouco)")
+      start = time.time()
 
-      #n_blocks_h e M: codificar -1
+      codebook, idxs = makeCodebook(M, elements) #Retorna uint8 codebook e índices
+
+      print(idxs.size)
+
+      #M: codificar -1
 
       #padding = (8 - (data_out.len % 8)) % 8
+
+      end = time.time()
+      print('Demorou: {} segundos'.format(end - start))
 
   except IOError as ioe:
     sys.exit('ERRO: Arquivo ou diretório "{}" não existente.'.format(ioe.filename))
@@ -44,28 +48,21 @@ def encoder(filename, M, directory=''):
   print("Terminado! Criado arquivo '{}'.\n".format(filename_result))
 
 #------------------------------
-def getBlocks(data, L):
-  n_blocks_h = data.shape[1]/L
-
-  blocks = []
-
-  for l in range(data.shape[0]):
-    for c in range(0, data.shape[1], L):
-      blocks.append(data[l:l+1,range(c, c+L)][0])#Pega cada bloco como um array de pixels
-
-  return np.array(blocks), int(n_blocks_h)
+def getElements(data):
+  return np.reshape(data, (1,-1,3))[0]
 
 #------------------------------
-def makeCodebook(m, blocks):
-  pass
-  #return codebook, idxs
+def makeCodebook(M, elements):
 
-#------------------------------
+  kmeans = KMeans(n_clusters= M).fit(elements)
+  return kmeans.cluster_centers_.astype(np.uint8), kmeans.labels_.astype(np.uint8)
+
+"""#------------------------------
 def pad (L, data):
   missing = lambda x: (L - (x % L)) % L
   padding_col = np.uint8(missing(data.shape[1]%L))
   return np.pad(data, ((0,0), (0,missing(data.shape[1])), (0,0))), padding_col
-
+"""
 #------------------------------
 if __name__ == "__main__":
   if len(sys.argv) > 1:
@@ -76,7 +73,7 @@ if __name__ == "__main__":
       filename = input("Informe o nome (caminho) da imagem a ser codificada: ")
 
   else:
-    M = int(input("Informe o tamanho (M) do codebook a ser gerado: "))
+    M = int(input("Informe o tamanho (M) do codebook (número de cores) a ser gerado: "))
     filename = input("Informe o nome (caminho) da imagem a ser codificada: ")
 
   directory = input("Informe o nome do diretório do resultado (será o atual caso não informado): ")
