@@ -24,8 +24,14 @@ def encoder(filename, M, directory=''):
       data = np.asarray(im)
 
       padded_data, padding_col = pad(L, data)
+  
+      print(padded_data)
+      print(padding_col)
 
-      #blocks, n_blocks_h = getBlocks(padded_data, L)
+      blocks, n_blocks_h = getBlocks(padded_data, L)
+
+      print(blocks)
+      print(n_blocks_h)
 
       #codebook, idxs = makeCodebook(M, blocks)
 
@@ -41,8 +47,9 @@ def encoder(filename, M, directory=''):
 
 #------------------------------
 def getBlocks(data, l):
-  pass
-  #return blocks, int(n_blocks_h)
+  n_blocks_h = data.shape[1]/N
+
+  return blocks, int(n_blocks_h)
 
 #------------------------------
 def makeCodebook(m, blocks):
