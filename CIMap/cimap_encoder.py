@@ -17,7 +17,7 @@ def encoder(filename, M, directory=''):
     with Image.open(filename) as im:
 
       if im.mode not in ['RGB', 'YCbCr', 'LAB', 'HSV']: #Verifica se a imagem é colorida
-            raise WrongFormat()
+            raise hp.WrongFormat()
 
       data = np.asarray(im)
 

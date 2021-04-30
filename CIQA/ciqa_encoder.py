@@ -77,8 +77,6 @@ def adaptiveQuantizer(N, M, data):
 
     data_out = data_out + quantizeFunc(b, y, bpp, info)
 
-  missing = lambda x: (8 - (x % 8))%8
-
   paddings.append((8 - (data_out.len % 8)) % 8)
 
   return data_out, paddings, n_blocks_h
