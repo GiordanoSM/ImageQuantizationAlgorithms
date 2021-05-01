@@ -67,7 +67,7 @@ def decoder (filename, M, padding_end, offset):
 def reconstructImageArray(pixels, num_col, mode):
   image_array = []
 
-  if not mode: #Se for colorida, reune 3 elementos em um pixel
+  if mode: #Se for colorida, reune 3 elementos em um pixel
     pixels = pixels.reshape(-1,3)
 
   for i in range(0, len(pixels), num_col):
@@ -94,4 +94,4 @@ if __name__ == "__main__":
     filename = sys.argv[1]
   else: filename = input("Informe o nome (caminho) da imagem (.cvq) a ser aberta: ")
   
-  openner(filename, use_dit)
+  openner(filename)

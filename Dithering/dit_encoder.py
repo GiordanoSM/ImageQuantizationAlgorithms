@@ -15,10 +15,10 @@ def encoder (filename, M, directory='', use_dit=False):
     with Image.open(filename) as im:
 
       if im.mode in ['RGB', 'YCbCr', 'LAB', 'HSV']: #Verifica se a imagem é colorida
-        mode = 0
+        mode = 1
 
       elif im.mode == 'L': #Ou se ela é preto e branco
-        mode = 1
+        mode = 0
 
       else: raise hp.WrongFormat()
 
@@ -31,7 +31,7 @@ def encoder (filename, M, directory='', use_dit=False):
 
       elements = getElements(data)
 
-      data_out, padding_end = quantizer(M, elements)
+      data_out, padding_end = quantizer(M, elements, use_dit, num_col, mode)
 
       with open(filename_result, 'wb') as f_write:
 
@@ -63,16 +63,30 @@ def getElements(data):
 
 #------------------------------
 
-def quantizer (M, elements):
-  bpp = int(np.ceil(np.log2(M)))
+def quantizer (M, elements, use_dit, num_col, mode):
+  bpe = int(np.ceil(np.log2(M)))
   data_out = bs.Bits(bin='0b')
+
+  depth = int(3**mode)
 
   delta = 255/M
   y = np.array([delta*(2*i - 1)/2 for i in range(1, M+1)])
 
-  for p in elements:
-    idx = findNearestIdx(y, p)
-    data_out = data_out + bs.Bits(uint=idx, length= bpp)
+  for i in range(len(elements)):
+    idx = findNearestIdx(y, elements[i])
+    data_out = data_out + bs.Bits(uint=idx, length= bpe)
+
+    if use_dit:
+      error = elements[i] - y[idx]
+      if i+depth < len(elements):
+        elements[i+depth] += error * 7/16
+        if i+(num_col-1)*depth < len(elements):
+          elements[i+(num_col-1)*depth] += error * 3/16
+          if i+num_col*depth < len(elements):
+            elements[i+num_col*depth] += error * 5/16
+            if i+(num_col+1)*depth < len(elements):
+              elements[i+(num_col+1)*depth] += error * 1/16
+
 
   padding_end = (8 - (data_out.len % 8)) % 8
 
