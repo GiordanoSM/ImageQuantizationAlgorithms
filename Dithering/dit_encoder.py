@@ -72,6 +72,8 @@ def quantizer (M, elements, use_dit, num_col, mode):
   delta = 255/M
   y = np.array([delta*(2*i - 1)/2 for i in range(1, M+1)])
 
+  ensureLimit = lambda x : min(255, max(0, x))
+
   for i in range(len(elements)):
     idx = findNearestIdx(y, elements[i])
     data_out = data_out + bs.Bits(uint=idx, length= bpe)
@@ -79,13 +81,13 @@ def quantizer (M, elements, use_dit, num_col, mode):
     if use_dit:
       error = elements[i] - y[idx]
       if i+depth < len(elements):
-        elements[i+depth] += error * 7/16
+        elements[i+depth] = ensureLimit(elements[i+depth] + error * 7/16)
         if i+(num_col-1)*depth < len(elements):
-          elements[i+(num_col-1)*depth] += error * 3/16
+          elements[i+(num_col-1)*depth] = ensureLimit(elements[i+(num_col-1)*depth] + error * 3/16)
           if i+num_col*depth < len(elements):
-            elements[i+num_col*depth] += error * 5/16
+            elements[i+num_col*depth] = ensureLimit(elements[i+num_col*depth] + error * 5/16)
             if i+(num_col+1)*depth < len(elements):
-              elements[i+(num_col+1)*depth] += error * 1/16
+              elements[i+(num_col+1)*depth] = ensureLimit(elements[i+(num_col+1)*depth] + error * 1/16)
 
 
   padding_end = (8 - (data_out.len % 8)) % 8
