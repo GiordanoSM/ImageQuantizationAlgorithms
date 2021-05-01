@@ -1,3 +1,5 @@
+#Esse aquivo executa os programas ciqa para diversas combinações de parâmetros definidas 'hard coded'
+
 import ciqa_encoder as ce
 import ciqa_openner as co
 from PIL import Image, UnidentifiedImageError, ImageOps

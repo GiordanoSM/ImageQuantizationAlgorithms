@@ -102,6 +102,6 @@ class WrongHeader(Exception):
 if __name__ == '__main__':
   if len(sys.argv) > 1:
     filename = sys.argv[1]
-  else: filename = input("Informe o nome (caminho) da imagem (.cvq) a ser aberta: ")
+  else: filename = input("Informe o nome (caminho) da imagem (.cmp) a ser aberta: ")
 
   openner(filename)

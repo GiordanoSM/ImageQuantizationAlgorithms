@@ -110,6 +110,9 @@ def getBlocks(N, data):
   n_blocks_h = data.shape[1]/N
   n_blocks_v = data.shape[0]/N
 
+  if n_blocks_h > 255:
+    sys.exit("ERRO: Programa interrompido. Escolha um maior valor para N.")
+
   blocks = []
 
   for l in range(0, data.shape[0], N):
@@ -129,11 +132,11 @@ if __name__ == '__main__':
       M = int(input("Informe o número de níveis (M) do quantizador: "))
 
   else:
-    N = int(input("Informe o tamanho do bloco (N) a ser utilizado: "))
+    N = int(input("Informe o tamanho dos lados do bloco (N) a ser utilizado: "))
     M = int(input("Informe o número de níveis (M) do quantizador: "))
 
-  if N > 255 or N < 0 or M > 255 or M < 0:
-    sys.exit("ERRO: Informe valores de N e M entre 0 e 255.")
+  if N > 255 or N < 1 or M > 255 or M < 1:
+    sys.exit("ERRO: Informe valores de N e M entre 1 e 255.")
 
   filename = input("Informe o nome (caminho) do arquivo a ser codificado: ")
   directory = input("Informe o nome do diretório do resultado (será o atual caso não informado): ")

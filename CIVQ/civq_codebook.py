@@ -64,10 +64,7 @@ def getElements(M, L, data):
   
 
 #-------------------------------------
-#Bem comportado até 255 blocos na horizontal
 def getBlocks(N, data):
-  n_blocks_h = data.shape[0]/N
-  n_blocks_v = data.shape[1]/N
 
   blocks = []
 
@@ -96,11 +93,14 @@ if __name__ == "__main__":
     if len(sys.argv) > 2:
       L = int(sys.argv[2])
     else:
-      filename = int(input("Informe o tamanho (M) do codebook a ser gerado: "))
+      L = int(input("Informe o tamanho (L) de cada bloco (considera-se um bloco quadrado): "))
 
   else:
     M = int(input("Informe o tamanho (M) do codebook a ser gerado: "))
     L = int(input("Informe o tamanho (L) de cada bloco (considera-se um bloco quadrado): "))
+
+  if L > 255 or L < 1 or M > 256 or M < 1:
+    sys.exit("ERRO: Informe valores de N e M válidos, entre 1 e 255; e 1 e 256, respectivamente.")
 
   filename = input("Informe o nome (caminho) da imagem a ser utilizada: ")
   directory = input("Informe o nome do diretório do resultado (será o atual caso não informado): ")

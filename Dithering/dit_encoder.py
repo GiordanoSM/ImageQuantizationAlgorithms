@@ -109,7 +109,7 @@ if __name__ == "__main__":
       filename = input("Informe o nome (caminho) da imagem a ser codificada: ")
 
   else:
-    M = int(input("Informe o tamanho (M) do codebook (número de cores) a ser gerado: "))
+    M = int(input("Informe o número de níveis (M) do quantizador: "))
     filename = input("Informe o nome (caminho) da imagem a ser codificada: ")
 
   directory = input("Informe o nome do diretório do resultado (será o atual caso não informado): ")
