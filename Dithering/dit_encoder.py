@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import time
 
-def encoder (filename, M, directory=''):
+def encoder (filename, M, directory='', use_dit=False):
   header = bs.Bits(hex='0xE0') #Header sendo E + identificador se é colorida ou preto e branco + numero de bits de padding no final do arquivo
 
   no_path_name = hp.remove_path(filename) #Adquire somente o nome do arquivo em a ser lido
@@ -97,5 +97,10 @@ if __name__ == "__main__":
     filename = input("Informe o nome (caminho) da imagem a ser codificada: ")
 
   directory = input("Informe o nome do diretório do resultado (será o atual caso não informado): ")
+  dithering = input("Deve ser utilizado Dithering? (S/N): ")
+
+  if dithering == 'S': use_dit = True
+  elif dithering == 'N': use_dit = False
+  else: sys.exit('ERRO: Valor inválido. Responda "S" ou "N".')
     
-  encoder(filename, M, directory)
+  encoder(filename, M, directory, use_dit)

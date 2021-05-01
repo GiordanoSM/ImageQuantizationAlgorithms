@@ -5,7 +5,7 @@ from PIL import Image, ImageShow
 import numpy as np
 import time
 
-def openner (filename, use_dit= True, show_image=True):
+def openner (filename, show_image=True):
   if filename[-4:] != '.dit': #Verifica se a extensão do arquivo a ser lido é a esperada
     sys.exit('Erro: Esperado arquivo de extensão: ".dit".')
 
@@ -93,11 +93,5 @@ if __name__ == "__main__":
   if len(sys.argv) > 1:
     filename = sys.argv[1]
   else: filename = input("Informe o nome (caminho) da imagem (.cvq) a ser aberta: ")
-
-  dithering = input("Deve ser utilizado Dithering? (S/N): ")
-
-  if dithering == 'S': use_dit = True
-  elif dithering == 'N': use_dit = False
-  else: sys.exit('ERRO: Valor inválido. Responda "S" ou "N".')
   
   openner(filename, use_dit)
