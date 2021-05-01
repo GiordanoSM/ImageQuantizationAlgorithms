@@ -1,7 +1,7 @@
 import helper as hp
 import bitstring as bs
 import sys
-from PIL import Image
+from PIL import Image, ImageShow
 import numpy as np
 import time
 
@@ -23,15 +23,15 @@ def openner (filename, use_dit= True, show_image=True):
 
     pixels = decoder(filename, M, padding_end, 32)#Extrai os pixels codificados
 
-    #image_array = reconstructImageArray(pixels, num_col, mode)#Retornar o array com a imagem decodificada
+    image_array = reconstructImageArray(pixels, num_col, mode)#Retornar o array com a imagem decodificada
 
     end = time.time()
     print('Demorou: {} segundos'.format(end - start))
 
-    #im = Image.fromarray(image_array)
+    im = Image.fromarray(image_array)
 
-    #if show_image:
-      #ImageShow.show(im)
+    if show_image:
+      ImageShow.show(im)
 
   except IOError as ioe:
     sys.exit('ERRO: Arquivo ou diretório "{}" não existente.'.format(ioe.filename))
@@ -39,7 +39,7 @@ def openner (filename, use_dit= True, show_image=True):
   except WrongHeader:
     sys.exit('Erro: Header do arquivo não condiz com o esperado.')
 
-  #return image_array
+  return image_array
 #------------------------------
 #Tem a função de extrair todos os pixels codificados
 def decoder (filename, M, padding_end, offset):
@@ -67,8 +67,11 @@ def decoder (filename, M, padding_end, offset):
 def reconstructImageArray(pixels, num_col, mode):
   image_array = []
 
-  #for i in range(0, len(pixels), num_col):
-    #image_array.append(pixels[i:i+num_col])
+  if not mode: #Se for colorida, reune 3 elementos em um pixel
+    pixels = pixels.reshape(-1,3)
+
+  for i in range(0, len(pixels), num_col):
+    image_array.append(pixels[i:i+num_col])
   
   return np.array(image_array)
 
