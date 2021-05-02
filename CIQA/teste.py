@@ -98,4 +98,8 @@ ax.legend()
 
 plt.show()
 
+for i in range(len(results)):
+  im = Image.fromarray(results[i])
+  im.save("../Plots/Parte1/peppers_{}_{}.png".format(N_l[i//len(M_l)],M_l[i%len(M_l)]))
+
 #print(sizes)

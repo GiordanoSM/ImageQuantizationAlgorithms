@@ -95,7 +95,10 @@ ax.set_title('PSNR x BPP')
 ax.grid(True)
 ax.legend()
 
-
 plt.show()
+
+for i in range(len(results)):
+  im = Image.fromarray(results[i])
+  im.save("../Plots/Parte2/lena_{}_{}.png".format(L_l[i//len(M_l)],M_l[i%len(M_l)]))
 
 #print(sizes)
